@@ -1,5 +1,7 @@
 import logoImg from '../assets/logo.svg';
 import deleteImg from '../assets/delete.svg';
+import checkImg from '../assets/check.svg';
+import answerImg from '../assets/answer.svg';
 
 import { Button } from '../components/Button';
 import { RoomCode } from '../components/RoomCode';
@@ -28,11 +30,22 @@ export function AdminRoom() {
     }
   }
 
+  const handleCheck = async (questionId: string) => {
+    await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
+      isAnswered: true
+    });
+  }
+
+  const handleAnswer = async (questionId: string) => {
+    await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
+      isHighlighted: true
+    });
+  }
+
   const handleEndRoom = async () => {
     database.ref(`rooms/${roomId}`).update({
       endAt: new Date()
     })
-
     history.push('/')
   }
 
@@ -60,7 +73,27 @@ export function AdminRoom() {
               key={question.id}
               content={question.content}
               author={question.author}
+              isAnswered={question.isAnswered}
+              isHighlighted={question.isHighlighted}
             >
+              {!question.isAnswered &&
+                (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleCheck(question.id)}
+                    >
+                      <img src={checkImg} alt="Check" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAnswer(question.id)}
+                    >
+                      <img src={answerImg} alt="Answer" />
+                    </button>
+                  </>
+                )
+              }
               <button
                 type="button"
                 onClick={() => handleDelete(question.id)}
